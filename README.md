@@ -19,7 +19,7 @@ then
 
 # using the API
 
-Load postma collection to test endpoints
+Load postman collection and update URLs according to your deployment to test endpoints.
 
 # testing
 
