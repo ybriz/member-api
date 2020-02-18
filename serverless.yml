@@ -1,0 +1,103 @@
+service:
+  name: members-api
+# app and org for use with dashboard.serverless.com
+
+custom:
+  webpack:
+    webpackConfig: ./webpack.config.js
+    includeModules: true
+  dynamodb:
+    stages:
+      - ${self:provider.stage}
+  myStage: ${opt:stage, self:provider.stage}
+  settings:
+    dev:
+      DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+
+plugins:
+  - serverless-webpack
+  - serverless-dynamodb-local
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-1
+  apiGateway:
+    minimumCompressionSize: 1024 # Enable gzip compression for responses > 1 KB
+  environment: 
+    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
+
+functions:
+  create:
+    handler: members/create.handler
+    events:
+      - http:
+          path: members
+          method: post
+          cors: true
+          request:
+            schema: 
+              "application/json": ${file(create_request.json)}
+    package:
+      include:
+        - databeseManager
+  list:
+    handler: members/list.handler
+    events:
+      - http:
+          path: members
+          method: get
+          cors: true
+
+  get:
+    handler: members/get.handler
+    events:
+      - http:
+          path: members/{id}
+          method: get
+          cors: true
+
+  update:
+    handler: members/update.handler
+    events:
+      - http:
+          path: members/{id}
+          method: put
+          cors: true
+
+  delete:
+    handler: members/delete.handler
+    events:
+      - http:
+          path: members/{id}
+          method: delete
+          cors: true
+  
+resources:
+  Resources:
+    MembersDynamoDbTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: itemId
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: itemId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMODB_TABLE}
