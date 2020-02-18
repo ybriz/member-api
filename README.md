@@ -3,7 +3,7 @@ title: MEMBER
 description: This example deploy a serverless API with TypeScript and DynamoDB.
 -->
 
-# requarements
+# requirements
 * serverless framework
 * Java Runtime Engine (JRE) version 6.x or newer
 
