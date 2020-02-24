@@ -1,23 +1,30 @@
 'use strict';
 
-const databaseManager = require('./databaseManager');
+import {deleteItem} from './databaseManager';
 
 export const handler = async (event) => {
   const itemId = event.pathParameters.id;
 
   try {
-    await databaseManager.deleteItem(itemId);
+    const member = await deleteItem(itemId);
+    
+    if(member.Attributes){
+      return {
+        statusCode: 200,
+        body: JSON.stringify(member.Attributes),
+      }
+    }
+
     return {
-      statusCode: 200,
-      body: JSON.stringify('Member was deleted'),
+      statusCode: 204
     }
   }
   catch (err) {
-    console.log(err)
+    console.log(`There was an error deleting Member ${itemId}. Error: ${err}`)
     return {
-      statusCode: err.statusCode || 501,
+      statusCode: err.statusCode || 500,
       headers: { 'Content-Type': 'text/plain' },
-      body: 'Couldn\'t remove the member item.',
+      body: 'There was an error deleting the Member.',
     }
   }
 

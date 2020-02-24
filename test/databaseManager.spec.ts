@@ -2,9 +2,7 @@
 
 require('./config');
 
-import * as chai from 'chai';
-
-const expect = chai.expect;
+import {expect} from 'chai';
 
 import * as AWS from 'aws-sdk';
 import * as databaseManager from '../members/databaseManager';
@@ -18,10 +16,6 @@ beforeEach(() => {
   databaseManager.initializateDynamoClient(dynamo);
 });
 
-afterEach(() => {
-  const dynamo = new AWS.DynamoDB.DocumentClient();
-  databaseManager.initializateDynamoClient(dynamo);
-});
 
 describe('Test database integration', () => {
   let item = {
@@ -81,15 +75,15 @@ describe('Test database integration', () => {
   it('save a member', async () => {
     const result = await databaseManager.saveItem(item);
 
-    expect('itemId').to.be.equal(result);
+    expect(result).to.be.equal('itemId');
   });
 
   it('get a member', async () => {
     const result = await databaseManager.getItem('itemId');
 
-    expect(item.itemId).to.be.equal(result.itemId);
-    expect(item.name).to.be.eql(result.name);
-    expect(item.email).to.be.equal(result.email);
+    expect(result.itemId).to.be.equal(item.itemId);
+    expect(result.name).to.be.eql(item.name);
+    expect(result.email).to.be.equal(item.email);
   });
 
   it('update a member', async () => {
@@ -103,6 +97,6 @@ describe('Test database integration', () => {
     await databaseManager.deleteItem('itemId');
     const member = await databaseManager.getItem('itemId');
     
-    expect(member).to.be.undefined;
+    expect(member).to.be.null;
   });
 });

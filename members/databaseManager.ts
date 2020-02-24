@@ -42,9 +42,12 @@ export const getItem = async (itemId) => {
     }
   };
 
-  const res = await dynamo.get(params).promise();
-  console.log(res)
-  return res.Item;
+  const response = await dynamo.get(params).promise();
+  if(response.Item) {
+    return response.Item
+  };
+
+  return null
 };
 
 export const deleteItem = async (itemId) => {
@@ -52,12 +55,13 @@ export const deleteItem = async (itemId) => {
     Key: {
       itemId: itemId
     },
-    TableName: TABLE_NAME
+    TableName: TABLE_NAME,
+    ReturnValues: "ALL_OLD"
   };
 
-  await dynamo.delete(params).promise();
+  const item = await dynamo.delete(params).promise();
 
-  return true;
+  return item;
 };
 
 export const updateItem = async (itemId, data) => {
@@ -85,7 +89,7 @@ export const updateItem = async (itemId, data) => {
     },
     UpdateExpression: `SET #member_name = :name, gender = :gender, #member_location = :location, email = :email, 
                           login = :login, dob = :dob, registered = :registered, phone = :phone, cell = :cell, picture = :picture, nat = :nat`,
-    ReturnValues: 'ALL_NEW' as const
+    ReturnValues: "ALL_NEW"
   };
   const result = await dynamo.update(params).promise();
 

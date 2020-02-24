@@ -1,22 +1,30 @@
 'use strict';
 
-import * as databaseManager from './databaseManager';
+import {getItem} from './databaseManager';
 
 export const handler = async (event) => {
 
   const itemId = event.pathParameters.id;
-  console.log(itemId)
+  console.log(`Member ID to be retrieved: ${itemId}`);
   try {
-    const result = await databaseManager.getItem(itemId);
+    const result = await getItem(itemId);
+
+    if(result) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify(result),
+      };
+    }
+
     return {
-      statusCode: 200,
-      body: JSON.stringify(result),
-    };
+      statusCode: 204
+    }
+    
   }
   catch (err) {
-    console.log(err)
+    console.log(`There was an error retrieving Member ${itemId}. Error: ${err}`)
     return {
-      statusCode: err.statusCode || 501,
+      statusCode: err.statusCode || 500,
       headers: { 'Content-Type': 'text/plain' },
       body: 'Couldn\'t fetch the member item.',
     }
