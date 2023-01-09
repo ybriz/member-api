@@ -20,7 +20,7 @@
     "chai": "^4.2.0",
     "fork-ts-checker-webpack-plugin": "^3.0.1",
     "mocha": "^7.0.1",
-    "serverless-offline": "^6.0.0-alpha.67",
+    "serverless-offline": "^12.0.4",
     "serverless-plugin-include-dependencies": "^4.0.1",
     "serverless-webpack": "^5.2.0",
     "sinon": "^8.1.1",
